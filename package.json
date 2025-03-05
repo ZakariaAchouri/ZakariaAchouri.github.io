@@ -1,0 +1,21 @@
+{
+  "name": "rhythm-player",
+  "version": "1.0.0",
+  "description": "A web component for playing rhythm patterns",
+  "main": "dist/rhythm-player.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack serve --mode development"
+  },
+  "dependencies": {
+    "beatbox.js": "^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.x.x",
+    "@babel/preset-env": "^7.x.x",
+    "babel-loader": "^8.x.x",
+    "webpack": "^5.x.x",
+    "webpack-cli": "^4.x.x",
+    "webpack-dev-server": "^4.x.x"
+  }
+}
