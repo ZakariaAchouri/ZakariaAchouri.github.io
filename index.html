@@ -7,14 +7,14 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"beatbox.js": "../dist/beatbox.js",
+					"beatbox.js": "./beatbox.js",
 					"events": "https://esm.sh/events"
 				}
 			}
 		</script>
 
 		<script type="module">
-			import Beatbox from 'beatbox.js';
+			import Beatbox from './beatbox.js';
 
 			(async () => {
 				const [sn, su] = await Promise.all(["sn.mp3", "su.mp3"].map((fname) => fetch(fname).then((res) => res.arrayBuffer())));
