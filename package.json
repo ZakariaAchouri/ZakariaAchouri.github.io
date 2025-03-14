@@ -8,6 +8,8 @@
     "dev": "webpack serve --mode development"
   },
   "dependencies": {
+    "pako": "^2.1.0",
+    "base64-arraybuffer": "^1.0.2",
     "beatbox.js": "^1.0.0"
   },
   "devDependencies": {

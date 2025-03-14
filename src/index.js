@@ -1,5 +1,5 @@
-// Import Beatbox if you have it as a dependency
-// import Beatbox from 'beatbox.js';
+// src/rhythm-player.js
+import { CustomBeatbox, loadAudioSample, toSoundName } from './audioUtils';
 
 class RhythmPlayer extends HTMLElement {
     constructor() {
@@ -55,7 +55,7 @@ class RhythmPlayer extends HTMLElement {
             </div>
         `;
 
-        // Initialize pattern
+        // Initialize Beatbox
         this.pattern = {
             length: 16,
             time: 1,
@@ -77,13 +77,14 @@ class RhythmPlayer extends HTMLElement {
             volumes: {}
         };
 
+        this.audioSamples = {};
+
         this.initializePlayer();
         this.setupEventListeners();
     }
 
     async initializePlayer() {
-        // Initialize Beatbox with audio samples
-        this.player = new Beatbox([], 1, true);
+        this.player = new CustomBeatbox([], 1, true);
         await this.loadAudioSamples();
         this.updatePlayer();
     }
@@ -91,7 +92,15 @@ class RhythmPlayer extends HTMLElement {
     async loadAudioSamples() {
         const instruments = ['ls', 'ms', 'hs', 'sn', 're', 'ta', 'ag'];
         for (const instr of instruments) {
-            await this.player.registerInstrument(instr, `/audio/samples/${instr}.mp3`);
+            try {
+                const response = await fetch(`/audio/samples/${instr}.mp3`);
+                const arrayBuffer = await response.arrayBuffer();
+                const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+                const audioBuffer = loadAudioSample(base64);
+                await this.player.registerInstrument(instr, audioBuffer);
+            } catch (error) {
+                console.error(`Failed to load audio sample for ${instr}:`, error);
+            }
         }
     }
 
@@ -126,13 +135,38 @@ class RhythmPlayer extends HTMLElement {
     }
 
     updatePlayer() {
-        this.player.setPattern(this.pattern);
+        const pattern = this.convertPatternToBeatbox();
+        this.player.setPattern(pattern);
         this.player.setBeatLength(60000/this.playbackSettings.speed/4);
         this.player.setRepeat(this.playbackSettings.loop);
         
-        // Update muted instruments
         Object.entries(this.playbackSettings.mute).forEach(([instr, isMuted]) => {
-            this.player.setVolume(isMuted ? 0 : 1, instr);
+            this.player.setVolume(isMuted ? 0 : this.playbackSettings.volume, instr);
+        });
+    }
+
+    convertPatternToBeatbox() {
+        const pattern = [];
+        const length = this.pattern.length;
+        
+        for (let i = 0; i < length; i++) {
+            const stroke = [];
+            for (const instr of Object.keys(this.pattern)) {
+                if (instr !== 'length' && instr !== 'time' && instr !== 'upbeat') {
+                    const strokeType = this.pattern[instr][i];
+                    if (strokeType && strokeType !== ' ') {
+                        stroke.push({
+                            instrument: toSoundName(instr, strokeType),
+                            volume: this.playbackSettings.volume
+                        });
+                    }
+                }
+            }
+            pattern[i] = stroke;
+        }
+
+        return Object.assign(pattern, {
+            upbeat: this.pattern.upbeat || 0
         });
     }
 }
