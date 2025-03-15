@@ -329,6 +329,15 @@
       header nav a:hover {
         text-decoration: underline;
       }
+      /* Large hero-style logo in the About tab */
+      .hero-logo {
+        display: block;
+        margin: 20px auto;
+        max-width: 600px; /* adjust as needed */
+        width: 100%;
+        height: auto;
+      }
+
       /* TAB STYLES */
       .tabs {
         margin: 20px 0;
@@ -453,9 +462,11 @@
         <li data-tab="tab-tunes">Tunes</li>
         <li data-tab="tab-composite">Composite Tunes</li>
       </ul>
+      <!-- ABOUT US TAB -->
       <div class="tab-content active" id="tab-about">
-        <!-- About Us content (from Who We Are) -->
-        <h1>Untitled: Bringing Thunder to the Streets</h1>
+        <!-- Large hero logo in place of "Untitled: Bringing Thunder..." -->
+        <img src="logo.png" alt="MD4P Logo" class="hero-logo">
+
         <section id="who-we-are" class="section">
           <h2>Who We Are</h2>
           <p>
@@ -463,16 +474,46 @@
             to amplify the Palestinian movement and raise morale through the power of rhythm.
             Our beats echo in the streets, providing a rallying call for justice, solidarity, and resistance.
           </p>
-          <p><a href="https://example.com/code-of-conduct" target="_blank">View our Code of Conduct</a></p>
+          <h3>Our Code of Conduct (Highlights)</h3>
+          <p>
+            As members of MD4P, we commit to the following guiding principles:
+          </p>
+          <ul>
+            <li>
+              We treat others how we want to be treated—both in person and online.
+              We act with kindness and respect, fostering an inclusive space for all.
+            </li>
+            <li>
+              We remain mindful of how our tone or phrasing might impact others,
+              striving for open and constructive dialogue.
+            </li>
+            <li>
+              We challenge any oppressive behavior (sexism, racism, homophobia) in ourselves and others,
+              aiming to keep the group safe and welcoming.
+            </li>
+            <li>
+              We commit to using protective equipment (like ear protection) during events,
+              and encourage others to do the same.
+            </li>
+            <li>
+              If approached about our behavior, we stay open and reflective on how to improve.
+            </li>
+          </ul>
+          <p>
+            <strong>“Our mission is to amplify the Palestinian movement and raise morale. 
+            We invite everyone to join our percussive purpose. 
+            We bring thunder in the streets until Palestine is free!”</strong>
+          </p>
+          <p><a href="https://example.com/code-of-conduct" target="_blank">View Full Code of Conduct</a></p>
         </section>
       </div>
+      <!-- SHOP TAB -->
       <div class="tab-content" id="tab-shop">
-        <!-- Shop content placeholder -->
         <h2>Shop</h2>
         <p>Our merchandise and drum accessories will be available here soon!</p>
       </div>
+      <!-- TUNES TAB -->
       <div class="tab-content" id="tab-tunes">
-        <!-- Tunes: Drumming Rhythms, Composition Beats, Standalone Beats, etc. -->
         <section id="drumming-rhythms" class="section">
           <h2>Drumming Rhythms and Hand Signals</h2>
           <p>
@@ -736,8 +777,9 @@
           <button class="play-button" onclick="player.setPattern(singleTriBeat); player.play()">Play 1 Tri-Hit</button>
         </section>
       </div>
+      <!-- COMPOSITE TUNES TAB -->
       <div class="tab-content" id="tab-composite">
-        <!-- Composite Tunes: Karla Tune Section -->
+        <!-- Karla Tune Section -->
         <section id="karla-tune" class="section">
           <h2>Karla Tune</h2>
           <p>
@@ -773,9 +815,14 @@
       <button onclick="pattern = pattern.reverse(); player.setPattern(pattern)">Reverse Pattern</button>
     </div>
 
-    <div id="beatbox-iframe" style="text-align: center;">
-      <iframe src="https://drive.google.com/file/d/1on7s4yKN0PuwZbQ86XdQAY7RgBF_peCN/preview" width="640" height="480" allow="autoplay"></iframe>
-    </div>
+    <!-- <div id="beatbox-iframe" style="text-align: center;">
+      <iframe 
+        src="https://drive.google.com/file/d/1on7s4yKN0PuwZbQ86XdQAY7RgBF_peCN/preview" 
+        width="640" 
+        height="480" 
+        allow="autoplay">
+      </iframe>
+    </div> -->
 
     <!-- ---------------------------
          TAB SWITCHING SCRIPT
