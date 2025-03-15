@@ -4,6 +4,12 @@
     <meta charset="utf-8">
     <title>Beatbox.js Demo &amp; Drumming Rhythms</title>
 
+
+    <meta charset="utf-8">
+    <!-- Ensures the page scales correctly on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beatbox.js Demo &amp; Drumming Rhythms</title>
+
     <!-- Importmap and Beatbox.js script -->
     <script type="importmap">
       {
@@ -294,8 +300,32 @@
         }
         playNext();
       }
+
+      // Make all composition beats globally accessible
+      window.compLevel1 = compLevel1;
+      window.compLevel2 = compLevel2;
+      window.compLevel3 = compLevel3;
+      window.compLevel4 = compLevel4;
+      window.compLevel5 = compLevel5;
+
+      // Make all standalone beats globally accessible
+      window.singleBeat = singleBeat;
+      window.doubleBeat = doubleBeat;
+      window.quadrupleBeat = quadrupleBeat;
+      window.singleTriBeat = singleTriBeat;
+      window.doubleTriBeat = doubleTriBeat;
+      window.quadrupleTriBeat = quadrupleTriBeat;
+      window.claveBeat = claveBeat;
+      window.karlaProgBreak1 = karlaProgBreak1;
+
+      // Make Karla patterns globally accessible
       window.playKarlaPattern = playKarlaPattern;
       window.playKarlaExampleSong = playKarlaExampleSong;
+      
+      // Make player controls globally accessible
+      window.player = player;
+      window.pattern = pattern;
+      window.bpm = bpm;
     </script>
 
     <!-- ---------------------------
@@ -316,6 +346,25 @@
         justify-content: space-between;
         padding: 10px 20px;
         background-color: #111;
+        flex-wrap: wrap; /* allows wrapping on smaller screens */
+        }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        }
+
+      .header-text {
+        font-size: 2em; /* adjust size as needed */
+        line-height: 1.2;
+        color: #eee;
+        margin-right: 20px; /* spacing between text and logo */
+        text-align: right;
+        }
+
+      .header-logo img {
+        height: 60px; /* same as desired text height */
+        width: auto;
       }
       header img {
         max-height: 60px;
@@ -445,14 +494,22 @@
   <body>
     <!-- HEADER WITH LOGO & EXTERNAL NAVIGATION -->
     <header>
-      <img src="logo.png" alt="Main Logo">
-      <nav>
-        <a href="about.html" target="_blank">About Us</a>
-        <a href="shop.html" target="_blank">Shop</a>
-        <a href="tunes.html" target="_blank">Tunes</a>
-        <a href="composite-tunes.html" target="_blank">Composite Tunes</a>
-      </nav>
-    </header>
+        <div class="header-left">
+          <div class="header-text">
+            <span>DRUMMER FOR</span><br>
+            <span>PALESTINE</span>
+          </div>
+          <div class="header-logo">
+            <img src="logo.png" alt="Main Logo">
+          </div>
+        </div>
+        <nav>
+          <a href="about.html" target="_blank">About Us</a>
+          <a href="shop.html" target="_blank">Shop</a>
+          <a href="tunes.html" target="_blank">Tunes</a>
+          <a href="composite-tunes.html" target="_blank">Composite Tunes</a>
+        </nav>
+      </header>
 
     <!-- TABBED INTERFACE -->
     <div class="tabs">
@@ -507,10 +564,21 @@
           <p><a href="https://example.com/code-of-conduct" target="_blank">View Full Code of Conduct</a></p>
         </section>
       </div>
-      <!-- SHOP TAB -->
+      <!-- SHOP TAB (WITH EMBEDDED GOOGLE FORM) -->
       <div class="tab-content" id="tab-shop">
         <h2>Shop</h2>
-        <p>Our merchandise and drum accessories will be available here soon!</p>
+        <p>Order your merchandise below!</p>
+        <div style="max-width: 640px; margin: 0 auto;">
+          <iframe
+            src="https://docs.google.com/forms/d/e/1FAIpQLScvktW5ylJQKdRM65rz-alm3GaYUUenTBXNMLoyMEzLgHxSCA/viewform?embedded=true"
+            width="100%"
+            height="1275"
+            frameborder="0"
+            marginheight="0"
+            marginwidth="0">
+            Loading…
+          </iframe>
+        </div>
       </div>
       <!-- TUNES TAB -->
       <div class="tab-content" id="tab-tunes">
