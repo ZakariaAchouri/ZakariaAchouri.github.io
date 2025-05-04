@@ -1,13 +1,914 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Rhythm Player Demo</title>
-</head>
-<body>
-    <!-- Load the bundled component -->
-    <script src="dist/rhythm-player.js"></script>
-    
-    <!-- Use the component -->
-    <rhythm-player></rhythm-player>
-</body>
+  <head>
+    <meta charset="utf-8">
+    <title>Beatbox.js Demo &amp; Drumming Rhythms</title>
+
+
+    <meta charset="utf-8">
+    <!-- Ensures the page scales correctly on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beatbox.js Demo &amp; Drumming Rhythms</title>
+
+    <!-- Importmap and Beatbox.js script -->
+    <script type="importmap">
+      {
+        "imports": {
+          "beatbox.js": "./beatbox.js",
+          "events": "https://esm.sh/events"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import Beatbox from './beatbox.js';
+
+      // ---------------------------
+      // INSTRUMENT LOADING (Random Variation)
+      // ---------------------------
+      const instrumentVariations = {
+        ag: ["audio/ag_2e.mp3", "audio/ag_6f.mp3", "audio/ag_61.mp3", "audio/ag_72.mp3"],
+        hs: ["audio/hs_30.mp3", "audio/hs_58.mp3", "audio/hs_68.mp3", "audio/hs_72.mp3"],
+        ls: ["audio/ls_58.mp3", "audio/ls_72.mp3", "audio/ls_30.mp3", "audio/ls_68.mp3"],
+        ms: ["audio/ms_30.mp3", "audio/ms_74.mp3", "audio/ms_58.mp3", "audio/ms_68.mp3"],
+        sn: ["audio/sn_30.mp3", "audio/sn_58.mp3", "audio/sn_72.mp3"],
+        su: ["audio/su_2e.mp3", "audio/su_6f.mp3", "audio/su_61.mp3", "audio/su_72.mp3"]
+      };
+
+      for (const inst in instrumentVariations) {
+        const files = instrumentVariations[inst];
+        const randomFile = files[Math.floor(Math.random() * files.length)];
+        fetch(randomFile)
+          .then((res) => res.arrayBuffer())
+          .then((buffer) => {
+            Beatbox.registerInstrument(inst, buffer);
+          })
+          .catch((err) => console.error(`Failed to load ${randomFile}:`, err));
+      }
+
+      // ---------------------------
+      // PATTERN & PLAYER INITIALIZATION
+      // ---------------------------
+      var sn_quiet = { instrument: "sn", volume: 0.3 };
+
+      // Default demo pattern (used for the demo controls)
+      window.pattern = [
+        ["sn", "su"],
+        [sn_quiet],
+        [sn_quiet],
+        [sn_quiet, "su"],
+        ["sn"],
+        [sn_quiet],
+        [sn_quiet, "su"],
+        [sn_quiet],
+        ["sn"],
+        [sn_quiet],
+        [sn_quiet, "su"],
+        [sn_quiet],
+        ["sn", "su"],
+        [sn_quiet],
+        [sn_quiet],
+        [sn_quiet]
+      ];
+      window.bpm = 100;
+      window.repeat = true;
+      window.player = new Beatbox(pattern, 60000 / bpm / 4, repeat);
+
+      player.on("beat", (beat) => {
+        document.getElementById("pos").innerHTML = "" + beat;
+      });
+      player.on("stop", () => {
+        document.getElementById("pos").innerHTML = "stop";
+      });
+
+      // ---------------------------
+      // UPDATED BEAT PATTERNS (16-step measures)
+      // ---------------------------
+      // Composition Beats:
+      const compLevel1 = [
+        ['sn'], [], [], [],
+        ['sn'], [], [], [],
+        ['sn'], [], [], [],
+        ['sn'], [], [], []
+      ];
+      const compLevel2 = [
+        ['sn','su'], [], [], [],
+        [], [], [], [],
+        ['sn','su'], [], [], [],
+        [], [], [], []
+      ];
+      const compLevel3 = [
+        ['sn'], [], [], [],
+        ['sn'], [], [], [],
+        ['sn'], [], [], [],
+        ['sn'], ['sn'], ['sn'], []
+      ];
+      const compLevel4_part1 = [
+        ['sn'], [], [], [],
+        ['sn'], [], [], [],
+        ['sn'], [], [], []
+      ];
+      const compLevel4_hits = [];
+      for (let i = 0; i < 17; i++) {
+        compLevel4_hits.push(['sn']);
+      }
+      const compLevel4_rest = [];
+      for (let i = 0; i < 4; i++) {
+        compLevel4_rest.push([]);
+      }
+      const compLevel4 = compLevel4_part1.concat(compLevel4_hits, compLevel4_rest);
+      const compLevel5 = Array(16).fill(['su']);
+
+      // Standalone Beats:
+      const singleBeat = compLevel1;
+      const doubleBeat = [
+        ['sn'], [], [], [],
+        [], [], [], [],
+        ['sn'], [], [], [],
+        [], [], [], []
+      ];
+      const quadrupleBeat = Array(16).fill(['sn']);
+      const singleTriBeat = [
+        ['sn','sn','sn'], [], [], [],
+        [], [], [], [],
+        [], [], [], [],
+        [], [], [], []
+      ];
+      const doubleTriBeat = [
+        ['sn','sn','sn'], [], [], [],
+        [], [], [], [],
+        ['sn','sn','sn'], [], [], [],
+        [], [], [], []
+      ];
+      const quadrupleTriBeat = [];
+      for (let count = 0; count < 4; count++) {
+        quadrupleTriBeat.push(['sn','sn','sn'], [], [], []);
+      }
+      const claveBeat = [
+        ['sn'], [], [], [],
+        ['sn'], [], [], [],
+        ['sn'], [], [], [],
+        ['sn'], ['sn'], [], []
+      ];
+      const karlaProgBreak1 = [
+        ['sn'], ['sn'], ['sn'], ['sn'],
+        ['sn'], ['sn'], ['sn'], ['sn'],
+        ['sn'], ['sn'], ['sn'], ['sn'],
+        [], [], [], []
+      ];
+
+      // ---------------------------
+      // KARLA TUNE SETUP
+      // ---------------------------
+      var karlaPatterns = {
+        "Tune": {
+          loop: true,
+          ls: "X     XX        X     XX        X     XX        X     XX X XX X ",
+          ms: "    X       X       X       X       X       X       X  X X XX X ",
+          hs: "@ms",
+          re: "X  XX  X X XX X X  XX  X X XX X X  XX  X X XX X X  XX  X X XX X ",
+          sn: "....X.......X.......X.......X.......X.......X.......X.......X...",
+          ta: "    X       X       X  X X XX       X       X       X  X X XX   ",
+          ag: "o  oa o o  oa o o  oa o o  oa o o  oa o o  oa o o  oa o o  oa o ",
+          sh: "................................................................",
+          mnemonics: {
+            ls: "Ra-bbit run Ra-bbit run Ra-bbit run Ra-bbit run from the ca-ges",
+            ms: "Run fast Run fast Run fast Run fast from the ca-ges",
+            re: "Ka-rla said you won't be fur coats Ka-rla said you won't be fur coats " +
+                "Ka-rla said you won't be fur coats Ka-rla said you won't be fur coats",
+            ta: "Ka-rla saved us from the farm Ka-rla saved us from the farm",
+            ag: "Ha-ppy bu-nnies ha-ppy bu-nnies Ha-ppy bu-nnies ha-ppy bu-nnies " +
+                "Ha-ppy bu-nnies ha-ppy bu-nnies Ha-ppy bu-nnies ha-ppy bu-nnies"
+          }
+        },
+        "Karla Break (Karla)": {
+          ls: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX               ",
+          ms: "@ls",
+          hs: "@ls",
+          re: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  XX  X X XX X ",
+          sn: "@ls",
+          ta: "X X X X X X X X X X X X X X X X X X X X X X X X X",
+          ag: "o o o o o o o o o o o o o o o o o o o o o o o o o",
+          sh: "@ls",
+          volumeHack: { 0: 0.2, 16: 0.4, 32: 0.7, 48: 1 }
+        },
+        "Break 2": {
+          ls: "XXXXXXXXXXXXXXXXX   X   X   X   X X    X X      X X    X X      ",
+          ms: "@ls",
+          hs: "@ls",
+          re: "XXXXXXXXXXXXXXXXX   X   X   X       X      XXXX     X      XXXX ",
+          sn: "@re",
+          ta: "X X X X X X X X X   X   X   X       X      XXXX     X      XXXX ",
+          ag: "@ta",
+          sh: "@re",
+          mnemonics: {
+            ls: "A-ny-bo-dy a-ny-bo-dy a-ny-bo-dy a-ny-bo-dy Got some le-ttuce? I have I have I have I have",
+            re: "A-ny-bo-dy a-ny-bo-dy a-ny-bo-dy a-ny-bo-dy Got some le-ttuce? Great We're star-ving here Great We're star-ving here",
+            ta: "A-ny-bo-dy a-ny-bo-dy Got some le-ttuce? Great We're star-ving here Great We're star-ving here"
+          }
+        },
+        "Break 2 Inverted": {
+          ls: "XXXXXXXXXXXXXXXXX   X   X   X   X X    X X      X X    X X      X X    X X      X X    X X      X   X   X   X   XXXXXXXXXXXXXXXX",
+          ms: "@ls",
+          hs: "@ls",
+          re: "XXXXXXXXXXXXXXXXX   X   X   X       X      XXXX     X      XXXX     X      XXXX     X      XXXX X   X   X   X   XXXXXXXXXXXXXXXX",
+          sn: "@re",
+          ta: "X X X X X X X X X   X   X   X       X      XXXX     X      XXXX     X      XXXX     X      XXXX X   X   X   X   X X X X X X X X ",
+          ag: "@ta",
+          sh: "@re",
+          mnemonics: {
+            ls: "A-ny-bo-dy a-ny-bo-dy a-ny-bo-dy a-ny-bo-dy Got some le-ttuce? I have I have I have I have " +
+                "I have I have I have I have Got some le-ttuce A-ny-bo-dy a-ny-bo-dy a-ny-bo-dy a-ny-bo-dy?",
+            re: "A-ny-bo-dy a-ny-bo-dy a-ny-bo-dy a-ny-bo-dy Got some le-ttuce? Great We're star-ving here Great We're star-ving here " +
+                "Great We're star-ving here Great We're star-ving here Got some le-ttuce A-ny-bo-dy a-ny-bo-dy a-ny-bo-dy a-ny-bo-dy?",
+            ta: "A-ny-bo-dy a-ny-bo-dy Got some le-ttuce? Great We're star-ving here Great We're star-ving here " +
+                "Great We're star-ving here Great We're star-ving here Got some le-ttuce A-ny-bo-dy a-ny-bo-dy?"
+          }
+        }
+      };
+
+      var karlaExampleSong = ["Tune", "Karla Break (Karla)", "Tune", "Break 2", "Tune", "Break 2 Inverted", "Tune"];
+
+      function parseKarlaPattern(patternObj) {
+        let parsed = {};
+        for (let key in patternObj) {
+          if (["loop", "mnemonics", "volumeHack"].includes(key)) continue;
+          let val = patternObj[key];
+          if (typeof val === "string" && val.trim().startsWith("@")) {
+            let refKey = val.trim().substring(1);
+            parsed[key] = patternObj[refKey];
+          } else {
+            parsed[key] = val;
+          }
+        }
+        let keys = Object.keys(parsed);
+        if (keys.length === 0) return [];
+        let length = parsed[keys[0]].length;
+        let patternArray = [];
+        for (let i = 0; i < length; i++) {
+          let beat = [];
+          keys.forEach(inst => {
+            let char = parsed[inst][i];
+            if (char && char !== " " && char !== ".") {
+              let volume = undefined;
+              if (patternObj.volumeHack && patternObj.volumeHack[i] !== undefined) {
+                volume = patternObj.volumeHack[i];
+              }
+              if (volume !== undefined) {
+                beat.push({ instrument: inst, volume: volume });
+              } else {
+                beat.push(inst);
+              }
+            }
+          });
+          patternArray.push(beat);
+        }
+        return patternArray;
+      }
+
+      function playKarlaPattern(patternName) {
+        let patObj = karlaPatterns[patternName];
+        if (!patObj) {
+          alert("Pattern not found: " + patternName);
+          return;
+        }
+        let parsedPattern = parseKarlaPattern(patObj);
+        player.setPattern(parsedPattern);
+        player.setBeatLength(60000 / bpm / 4);
+        player.play();
+      }
+      function playKarlaExampleSong() {
+        let index = 0;
+        function playNext() {
+          if (index >= karlaExampleSong.length) return;
+          let name = karlaExampleSong[index];
+          let patObj = karlaPatterns[name];
+          if (!patObj) {
+            index++;
+            playNext();
+            return;
+          }
+          let parsedPattern = parseKarlaPattern(patObj);
+          player.setPattern(parsedPattern);
+          player.setBeatLength(60000 / bpm / 4);
+          player.play();
+          setTimeout(() => {
+            player.stop();
+            index++;
+            playNext();
+          }, 4000);
+        }
+        playNext();
+      }
+
+      // Make all composition beats globally accessible
+      window.compLevel1 = compLevel1;
+      window.compLevel2 = compLevel2;
+      window.compLevel3 = compLevel3;
+      window.compLevel4 = compLevel4;
+      window.compLevel5 = compLevel5;
+
+      // Make all standalone beats globally accessible
+      window.singleBeat = singleBeat;
+      window.doubleBeat = doubleBeat;
+      window.quadrupleBeat = quadrupleBeat;
+      window.singleTriBeat = singleTriBeat;
+      window.doubleTriBeat = doubleTriBeat;
+      window.quadrupleTriBeat = quadrupleTriBeat;
+      window.claveBeat = claveBeat;
+      window.karlaProgBreak1 = karlaProgBreak1;
+
+      // Make Karla patterns globally accessible
+      window.playKarlaPattern = playKarlaPattern;
+      window.playKarlaExampleSong = playKarlaExampleSong;
+      
+      // Make player controls globally accessible
+      window.player = player;
+      window.pattern = pattern;
+      window.bpm = bpm;
+    </script>
+
+    <!-- ---------------------------
+         STYLES
+         --------------------------- -->
+    <style>
+      body {
+        background-color: #000;
+        color: #eee;
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0 20px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        background-color: #111;
+        flex-wrap: wrap; /* allows wrapping on smaller screens */
+        }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        }
+
+      .header-text {
+        font-size: 2em; /* adjust size as needed */
+        line-height: 1.2;
+        color: #eee;
+        margin-right: 20px; /* spacing between text and logo */
+        text-align: right;
+        }
+
+      .header-logo img {
+        height: 60px; /* same as desired text height */
+        width: auto;
+      }
+      header img {
+        max-height: 60px;
+      }
+      header nav a {
+        color: #66f;
+        text-decoration: none;
+        margin: 0 10px;
+        font-size: 1.1em;
+      }
+      header nav a:hover {
+        text-decoration: underline;
+      }
+      /* Large hero-style logo in the About tab */
+      .hero-logo {
+        display: block;
+        margin: 20px auto;
+        max-width: 600px; /* adjust as needed */
+        width: 100%;
+        height: auto;
+      }
+
+      /* TAB STYLES */
+      .tabs {
+        margin: 20px 0;
+      }
+      .tab-buttons {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        border-bottom: 2px solid #444;
+      }
+      .tab-buttons li {
+        padding: 10px 20px;
+        cursor: pointer;
+        background-color: #222;
+        margin-right: 2px;
+      }
+      .tab-buttons li.active {
+        background-color: #333;
+        font-weight: bold;
+      }
+      .tab-content {
+        display: none;
+        padding: 20px;
+        background-color: #111;
+        border: 1px solid #444;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      h1, h2, h3 {
+        margin-top: 1.2em;
+        margin-bottom: 0.5em;
+      }
+      h1 {
+        font-size: 2.5em;
+        text-align: center;
+        margin-bottom: 0.2em;
+      }
+      h2 {
+        font-size: 2em;
+        border-bottom: 2px solid #444;
+        padding-bottom: 0.2em;
+      }
+      h3 {
+        font-size: 1.5em;
+      }
+      p {
+        margin-bottom: 1em;
+      }
+      a {
+        color: #66f;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      /* Beatbox controls styling */
+      #beatbox-controls, #beatbox-iframe {
+        margin: 20px 0;
+        text-align: center;
+      }
+      button {
+        padding: 10px 15px;
+        margin: 5px;
+        border: none;
+        background-color: #333;
+        color: #eee;
+        cursor: pointer;
+        font-size: 1em;
+      }
+      button:hover {
+        background-color: #555;
+      }
+      /* Content sections styling */
+      .section {
+        margin-bottom: 40px;
+        padding: 10px;
+      }
+      /* Table styling */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      th, td {
+        border: 1px solid #666;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #222;
+      }
+      tr:nth-child(even) {
+        background-color: #111;
+      }
+      .level, .beat {
+        margin-bottom: 20px;
+      }
+      .play-button {
+        margin-top: 5px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HEADER WITH LOGO & EXTERNAL NAVIGATION -->
+    <header>
+        <div class="header-left">
+          <div class="header-text">
+            <span>DRUMMER FOR</span><br>
+            <span>PALESTINE</span>
+          </div>
+          <div class="header-logo">
+            <img src="logo.png" alt="Main Logo">
+          </div>
+        </div>
+        <nav>
+          <a href="about.html" target="_blank">About Us</a>
+          <a href="shop.html" target="_blank">Shop</a>
+          <a href="tunes.html" target="_blank">Tunes</a>
+          <a href="composite-tunes.html" target="_blank">Composite Tunes</a>
+        </nav>
+      </header>
+
+    <!-- TABBED INTERFACE -->
+    <div class="tabs">
+      <ul class="tab-buttons">
+        <li class="active" data-tab="tab-about">About Us</li>
+        <li data-tab="tab-shop">Shop</li>
+        <li data-tab="tab-tunes">Tunes</li>
+        <li data-tab="tab-composite">Composite Tunes</li>
+      </ul>
+      <!-- ABOUT US TAB -->
+      <div class="tab-content active" id="tab-about">
+        <!-- Large hero logo in place of "Untitled: Bringing Thunder..." -->
+        <img src="logo.png" alt="MD4P Logo" class="hero-logo">
+
+        <section id="who-we-are" class="section">
+          <h2>Who We Are</h2>
+          <p>
+            We are a collective of passionate drummers united by a shared purpose:
+            to amplify the Palestinian movement and raise morale through the power of rhythm.
+            Our beats echo in the streets, providing a rallying call for justice, solidarity, and resistance.
+          </p>
+          <h3>Our Code of Conduct (Highlights)</h3>
+          <p>
+            As members of MD4P, we commit to the following guiding principles:
+          </p>
+          <ul>
+            <li>
+              We treat others how we want to be treated—both in person and online.
+              We act with kindness and respect, fostering an inclusive space for all.
+            </li>
+            <li>
+              We remain mindful of how our tone or phrasing might impact others,
+              striving for open and constructive dialogue.
+            </li>
+            <li>
+              We challenge any oppressive behavior (sexism, racism, homophobia) in ourselves and others,
+              aiming to keep the group safe and welcoming.
+            </li>
+            <li>
+              We commit to using protective equipment (like ear protection) during events,
+              and encourage others to do the same.
+            </li>
+            <li>
+              If approached about our behavior, we stay open and reflective on how to improve.
+            </li>
+          </ul>
+          <p>
+            <strong>“Our mission is to amplify the Palestinian movement and raise morale. 
+            We invite everyone to join our percussive purpose. 
+            We bring thunder in the streets until Palestine is free!”</strong>
+          </p>
+          <p><a href="https://example.com/code-of-conduct" target="_blank">View Full Code of Conduct</a></p>
+        </section>
+      </div>
+      <!-- SHOP TAB (WITH EMBEDDED GOOGLE FORM) -->
+      <div class="tab-content" id="tab-shop">
+        <h2>Shop</h2>
+        <p>Order your merchandise below!</p>
+        <div style="max-width: 640px; margin: 0 auto;">
+          <iframe
+            src="https://docs.google.com/forms/d/e/1FAIpQLScvktW5ylJQKdRM65rz-alm3GaYUUenTBXNMLoyMEzLgHxSCA/viewform?embedded=true"
+            width="100%"
+            height="1275"
+            frameborder="0"
+            marginheight="0"
+            marginwidth="0">
+            Loading…
+          </iframe>
+        </div>
+      </div>
+      <!-- TUNES TAB -->
+      <div class="tab-content" id="tab-tunes">
+        <section id="drumming-rhythms" class="section">
+          <h2>Drumming Rhythms and Hand Signals</h2>
+          <p>
+            Our rhythms are built on a foundational 4-count structure. Each beat is crafted for clarity and power.
+            Whether it’s a steady pulse or complex layered patterns, every rhythm is designed to inspire.
+          </p>
+        </section>
+        <section id="composition-beats" class="section">
+          <h2>Composition Beats: The Five Levels</h2>
+          <p>
+            Each level builds upon the previous one:
+            <strong>Level 1</strong>: A steady pulse on every count.
+            <strong>Level 2</strong>: Double beats on counts 1 and 3.
+            <strong>Level 3</strong>: Solid beats on counts 1-3 with a rapid tri-beat on count 4.
+            <strong>Level 4</strong>: Explosive 4th count with rapid-fire hits.
+            <strong>Level 5</strong>: A continuous, powerful hi-hat pulse.
+          </p>
+          <div class="level">
+            <h3>Level 1</h3>
+            <p>Single beat every count.</p>
+            <button class="play-button" onclick="player.setPattern(compLevel1); player.play()">Play Level 1</button>
+          </div>
+          <div class="level">
+            <h3>Level 2</h3>
+            <p>Double beat on counts 1 and 3.</p>
+            <button class="play-button" onclick="player.setPattern(compLevel2); player.play()">Play Level 2</button>
+          </div>
+          <div class="level">
+            <h3>Level 3</h3>
+            <p>Solid beats on counts 1-3 with a tri-beat on count 4.</p>
+            <button class="play-button" onclick="player.setPattern(compLevel3); player.play()">Play Level 3</button>
+          </div>
+          <div class="level">
+            <h3>Level 4</h3>
+            <p>Level 3 with an explosive 4th count (17 rapid hits then 4 rests).</p>
+            <button class="play-button" onclick="player.setPattern(compLevel4); player.play()">Play Level 4</button>
+          </div>
+          <div class="level">
+            <h3>Level 5</h3>
+            <p>Continuous hi-hat pulse on every count.</p>
+            <button class="play-button" onclick="player.setPattern(compLevel5); player.play()">Play Level 5</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Level 1</td>
+                <td>Single beat every count</td>
+              </tr>
+              <tr>
+                <td>Level 2</td>
+                <td>Double beat on counts 1 and 3</td>
+              </tr>
+              <tr>
+                <td>Level 3</td>
+                <td>Solid beats on counts 1-3 with a tri-beat on count 4</td>
+              </tr>
+              <tr>
+                <td>Level 4</td>
+                <td>Explosive 4th count (17 hits, then 4 rests)</td>
+              </tr>
+              <tr>
+                <td>Level 5</td>
+                <td>Continuous hi-hat pulse</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <section id="standalone-beats" class="section">
+          <h2>Standalone Beats</h2>
+          <div class="beat">
+            <h3>Single Beat</h3>
+            <p>A steady hit every count.</p>
+            <button class="play-button" onclick="player.setPattern(singleBeat); player.play()">Play Single Beat</button>
+          </div>
+          <div class="beat">
+            <h3>Double Beat</h3>
+            <p>Hits only on counts 1 and 3.</p>
+            <button class="play-button" onclick="player.setPattern(doubleBeat); player.play()">Play Double Beat</button>
+          </div>
+          <div class="beat">
+            <h3>Quadruple Beat</h3>
+            <p>A hit on every count.</p>
+            <button class="play-button" onclick="player.setPattern(quadrupleBeat); player.play()">Play Quadruple Beat</button>
+          </div>
+          <div class="beat">
+            <h3>Single Tri-Beat</h3>
+            <p>Three rapid hits in one count.</p>
+            <button class="play-button" onclick="player.setPattern(singleTriBeat); player.play()">Play Single Tri-Beat</button>
+          </div>
+          <div class="beat">
+            <h3>Double Tri-Beat</h3>
+            <p>Tri-beats on counts 1 and 3.</p>
+            <button class="play-button" onclick="player.setPattern(doubleTriBeat); player.play()">Play Double Tri-Beat</button>
+          </div>
+          <div class="beat">
+            <h3>Quadruple Tri-Beat</h3>
+            <p>Tri-beats on every count.</p>
+            <button class="play-button" onclick="player.setPattern(quadrupleTriBeat); player.play()">Play Quadruple Tri-Beat</button>
+          </div>
+          <div class="beat">
+            <h3>Clave</h3>
+            <p>Classic pattern: “Shut the sys-tem down.”</p>
+            <button class="play-button" onclick="player.setPattern(claveBeat); player.play()">Play Clave Beat</button>
+          </div>
+          <div class="beat">
+            <h3>Karla Prog Break 1</h3>
+            <p>4 soft beats, 4 medium, 4 loud, then 4 rests.</p>
+            <button class="play-button" onclick="player.setPattern(karlaProgBreak1); player.play()">Play Karla Prog Break 1</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Beat</th>
+                <th>How It's Played</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>8 Beat</td>
+                <td>8 hits in a 16-step measure (every 2 steps)</td>
+              </tr>
+              <tr>
+                <td>1 Tri-Hit</td>
+                <td>Three rapid hits on count 1</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <section id="chant-beats" class="section">
+          <h2>Chant-Beats: Gaza</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Level 1</td>
+                <td>Basic beat for everyone</td>
+              </tr>
+              <tr>
+                <td>Level 2</td>
+                <td>Snares add a rim beat</td>
+              </tr>
+              <tr>
+                <td>Level 3</td>
+                <td>Surdos add a single tri-beat</td>
+              </tr>
+              <tr>
+                <td>Level 4</td>
+                <td>Snares play a technical pattern</td>
+              </tr>
+              <tr>
+                <td>Level 5</td>
+                <td>Signature “hedgehog” tune</td>
+              </tr>
+            </tbody>
+          </table>
+          <div>
+            <h3>Gaza Patterns</h3>
+            <button class="play-button" onclick="player.setPattern(singleBeat); player.play()">Play Level 1</button>
+            <button class="play-button" onclick="player.setPattern(doubleBeat); player.play()">Play Level 2</button>
+            <button class="play-button" onclick="player.setPattern(singleTriBeat); player.play()">Play Level 3</button>
+            <button class="play-button" onclick="player.setPattern(quadrupleTriBeat); player.play()">Play Level 4</button>
+            <button class="play-button" onclick="player.setPattern(compLevel5); player.play()">Play Level 5</button>
+          </div>
+        </section>
+        <section id="end-occupation" class="section">
+          <h2>End The Occupation</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Level 1</td>
+                <td>Only snares play</td>
+              </tr>
+              <tr>
+                <td>Level 2</td>
+                <td>Everyone joins in</td>
+              </tr>
+              <tr>
+                <td>Level 3</td>
+                <td>Snares add a technical twist</td>
+              </tr>
+              <tr>
+                <td>Level 4</td>
+                <td>Snares perform 3/4 of a hedgehog loop</td>
+              </tr>
+              <tr>
+                <td>Notes</td>
+                <td>Levels 4+ are guided by the whistler for clarity.</td>
+              </tr>
+            </tbody>
+          </table>
+          <button class="play-button" onclick="player.setPattern(compLevel5); player.play()">Play End The Occupation Beat</button>
+        </section>
+        <section id="we-are-the-people" class="section">
+          <h2>We Are The People</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Level 1</td>
+                <td>Surdos only</td>
+              </tr>
+              <tr>
+                <td>Level 2</td>
+                <td>Snares join with a rim beat (usually twice)</td>
+              </tr>
+              <tr>
+                <td>Level 3</td>
+                <td>Snares shift to full technical mode</td>
+              </tr>
+              <tr>
+                <td>Notes</td>
+                <td>The whistler may hold Level 2 to build momentum.</td>
+              </tr>
+            </tbody>
+          </table>
+          <button class="play-button" onclick="player.setPattern(compLevel5); player.play()">Play 'We Are The People' Beat</button>
+        </section>
+        <section id="complete-beats" class="section">
+          <h2>Complete Beats Overview</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Beat</th>
+                <th>How It's Played</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>8 Beat</td>
+                <td>8 hits in a 16-step measure (every 2 steps)</td>
+              </tr>
+              <tr>
+                <td>1 Tri-Hit</td>
+                <td>Three rapid hits on count 1</td>
+              </tr>
+            </tbody>
+          </table>
+          <button class="play-button" onclick="player.setPattern(quadrupleBeat); player.play()">Play 8 Beat</button>
+          <button class="play-button" onclick="player.setPattern(singleTriBeat); player.play()">Play 1 Tri-Hit</button>
+        </section>
+      </div>
+      <!-- COMPOSITE TUNES TAB -->
+      <div class="tab-content" id="tab-composite">
+        <!-- Karla Tune Section -->
+        <section id="karla-tune" class="section">
+          <h2>Karla Tune</h2>
+          <p>
+            This section presents the Karla Tune. View the sheet music <a href="karla.pdf" target="_blank">here</a>
+            and read the description <a href="karla-shnikov.md" target="_blank">here</a>.
+          </p>
+          <p>Below are the available Karla patterns. Click a button to hear that pattern.</p>
+          <div>
+            <button class="play-button" onclick="playKarlaPattern('Tune')">Play "Tune"</button>
+            <button class="play-button" onclick="playKarlaPattern('Karla Break (Karla)')">Play "Karla Break (Karla)"</button>
+            <button class="play-button" onclick="playKarlaPattern('Break 2')">Play "Break 2"</button>
+            <button class="play-button" onclick="playKarlaPattern('Break 2 Inverted')">Play "Break 2 Inverted"</button>
+          </div>
+          <div style="margin-top:20px;">
+            <button class="play-button" onclick="playKarlaExampleSong()">Play Karla Example Song</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ---------------------------
+         DEMO CONTROLS & IFRAME
+         --------------------------- -->
+    <div id="beatbox-controls">
+      <button onclick="player.play()">Play</button>
+      <button onclick="player.stop()">Stop</button>
+      <button onclick="player.setPosition(0)">Reset</button>
+      Position: <span id="pos"></span>
+      <br>
+      <button onclick="bpm += 10; player.setBeatLength(60000/bpm/4)">+10 BPM</button>
+      <button onclick="bpm -= 10; player.setBeatLength(60000/bpm/4)">-10 BPM</button>
+      <button onclick="repeat = !repeat; player.setRepeat(repeat)">Toggle Repeat</button>
+      <button onclick="pattern = pattern.reverse(); player.setPattern(pattern)">Reverse Pattern</button>
+    </div>
+
+    <!-- <div id="beatbox-iframe" style="text-align: center;">
+      <iframe 
+        src="https://drive.google.com/file/d/1on7s4yKN0PuwZbQ86XdQAY7RgBF_peCN/preview" 
+        width="640" 
+        height="480" 
+        allow="autoplay">
+      </iframe>
+    </div> -->
+
+    <!-- ---------------------------
+         TAB SWITCHING SCRIPT
+         --------------------------- -->
+    <script>
+      const tabButtons = document.querySelectorAll(".tab-buttons li");
+      const tabContents = document.querySelectorAll(".tab-content");
+
+      tabButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          // Remove active class from all buttons and contents
+          tabButtons.forEach(btn => btn.classList.remove("active"));
+          tabContents.forEach(content => content.classList.remove("active"));
+          // Activate the clicked button and corresponding content
+          button.classList.add("active");
+          document.getElementById(button.getAttribute("data-tab")).classList.add("active");
+        });
+      });
+    </script>
+  </body>
 </html>
